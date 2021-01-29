@@ -1,0 +1,77 @@
+.row.top_row
+  .col-sm-6.user_att
+    %h2= @user.email
+    - if @user.avatar_file_name
+      = image_tag @user.avatar.url(:thumb)
+  .col-sm-6
+    = link_to 'Logout', log_out_path, class: ['btn', 'btn-danger', 'logout_btn']
+  .row
+    = link_to 'Add Photo', new_user_photo_path(@user), class: ['btn', 'btn-success', 'add_photo_btn']
+  .row
+    = link_to 'All Users', {:action => 'index', :id => @user.id}, class: ['btn', 'btn-primary', 'all_user_btn']
+%br/
+%br/
+%br/
+.row
+  - if !@user.photos.empty?
+    %h1{:align => "center"}
+      %i> My Photos
+    %br/
+    %br/
+    %h2#caption Slide Show
+    -userPhotos =  @user.photos.sort_by{|e| e.created_at}.reverse
+    %img#slide{alt: "",  src: userPhotos.first.image.url(:medium), href: user_photo_path(@user.id, userPhotos.first.id)}
+    #slides
+      - userPhotos.each  do |photo|
+        .well.col-sm-4
+          %h4{:align => "left"}
+            %b Title: #{photo.title}
+          %img{alt: photo.title ,  src: photo.image.url(:medium), href: user_photo_path(@user.id, photo.id)}
+          = link_to 'Delete', user_photo_path(@user.id, photo.id), :method => :delete, :confirm => 'Are you sure?'
+          = form_for @tag do |f|
+            = f.hidden_field :photo_id, value: photo.id
+            = f.collection_select :user_id, @users, :id, :email
+            = f.submit "Tag User"
+          - photo.tags.each do |tag|
+            = tag.user.email
+          %br
+          = link_to 'Add a comment...', user_photo_path(@user.id, photo.id)
+          %br
+          - photo.comments.each do |comment|
+            = comment.user.email
+            = comment.body
+            %br
+
+  .row
+  - if !@user.following.empty?
+    %h1{:align => "center"}
+      %i> My Followers Photos
+      %br
+      %br
+    - @user.following.each do |followed|
+      .row
+      - if !followed.photos.empty?
+        %h1{:align => "center"}
+          %i> photos from #{followed.email}
+        %h2#caption Slide Show
+        -followerPhotos = followed.photos.sort_by{|e| e.created_at}.reverse
+        %img#slide{alt: "",  src:followerPhotos.first.image.url(:medium), href: user_photo_path(@user.id, followerPhotos.first.id) }
+        #slides
+          - followerPhotos.each  do |photo|
+            .well.col-sm-4
+              %h4{:align => "left"}
+                %b Title: #{photo.title}
+              %img{alt: photo.title ,  src: photo.image.url(:medium), href: user_photo_path(@user.id,photo.id)}
+              = form_for @tag do |f|
+                = f.hidden_field :photo_id, value: photo.id
+                = f.collection_select :user_id, @users, :id, :email
+                = f.submit "Tag User"
+              - photo.tags.each do |tag|
+                = tag.user.email
+              %br
+              = link_to 'Add a comment...', user_photo_path(@user.id, photo.id)
+              %br
+              - photo.comments.each do |comment|
+                = comment.user.email
+                = comment.body
+                %br

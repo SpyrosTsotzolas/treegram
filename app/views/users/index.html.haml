@@ -1,0 +1,39 @@
+.row.top_row
+  .col-sm-6.user_att
+    %h2= User.find(params[:id]).email
+    - if User.find(params[:id]).avatar_file_name
+      = image_tag User.find(params[:id]).avatar.url(:thumb)
+      %br
+      %br
+      = link_to 'Go Back', user_path(User.find(params[:id])), class: ['btn', 'btn-primary']
+  .col-sm-6
+    = link_to 'Logout', log_out_path, class: ['btn', 'btn-danger', 'logout_btn']
+
+%br/
+%br/
+%br/
+%br/
+%br/
+%br/
+%br/
+%br/
+%br/
+%br/
+
+%h2{:align => "left"}All Suggestions
+%br
+%table#users
+  %thead
+    %tr
+      %th User Email
+      %th Option
+
+  %tbody
+    - @users.each do |user|
+      %tr
+        %td= user.email
+        - if user != current_user
+          - if user.followers.include?(User.find(params[:id]))
+            %td= button_to "Unfollow", follow_path(user.id), method: :delete, :class => "btn btn-default"
+          - else
+            %td= button_to "Follow", user_follows_path(user_id: user.id), method: :post, :class => "btn btn-primary"

@@ -1,0 +1,14 @@
+%h2{:align => "left"}#{"Comments for image with title: " + @photo.title}
+-@photo.comments.order(created_at: :desc).each do |comment|
+  %strong= comment.user.email
+  = comment.body
+  %br
+
+%h4 Enter a new comment
+= form_for @comment do |f|
+  = f.hidden_field :photo_id, value: @photo.id
+  = f.hidden_field :user_id, value: @user.id
+  = f.label :body
+  = f.text_area :body
+  %br
+  = f.submit 'Save comment'
